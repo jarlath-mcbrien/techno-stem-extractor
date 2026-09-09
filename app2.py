@@ -1,0 +1,80 @@
+import streamlit as st
+import subprocess
+import os
+import shutil
+import tempfile
+
+st.set_page_config(page_title="Techno Stem Extractor", page_icon="🎛️", layout="centered")
+
+st.title("🎛️ Techno Stem Extractor")
+st.write("Extract Drums, Bass, Vocals, and Other stems using Meta's Demucs (`htdemucs_ft`).")
+
+uploaded_file = st.file_uploader("Upload a techno track (.wav, .mp3, .flac)", type=["wav", "mp3", "flac"])
+
+if uploaded_file is not None:
+    st.audio(uploaded_file, format="audio/wav")
+    
+    if st.button("Extract Stems", type="primary"):
+        with st.spinner("Processing audio... (This takes 3–5 minutes on free CPU)"):
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Save uploaded file
+                input_path = os.path.join(temp_dir, uploaded_file.name)
+                with open(input_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                
+                # Run Demucs with memory-efficient 10s chunking
+                cmd = [
+                    "python3", "-m", "demucs.separate",
+                    "-n", "htdemucs_ft",
+                    "--segment", "10",
+                    "-o", temp_dir,
+                    input_path
+                ]
+                
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                
+                if result.returncode == 0:
+                    song_name = os.path.splitext(uploaded_file.name)[0]
+                    stem_dir = os.path.join(temp_dir, "htdemucs_ft", song_name)
+                    
+                    st.success("Extraction Complete!")
+                    
+                    col1, col2 = st.columns(2)
+                    
+                    drums_path = os.path.join(stem_dir, "drums.wav")
+                    bass_path = os.path.join(stem_dir, "bass.wav")
+                    vocals_path = os.path.join(stem_dir, "vocals.wav")
+                    other_path = os.path.join(stem_dir, "other.wav")
+                    
+                    if os.path.exists(drums_path):
+                        with col1:
+                            st.subheader("🥁 Drums (Kick & Perc)")
+                            st.audio(drums_path)
+                            with open(drums_path, "rb") as f:
+                                st.download_button("Download Drums", f, file_name=f"{song_name}_drums.wav")
+                                
+                    if os.path.exists(bass_path):
+                        with col2:
+                            st.subheader("🔊 Bass & Sub")
+                            st.audio(bass_path)
+                            with open(bass_path, "rb") as f:
+                                st.download_button("Download Bass", f, file_name=f"{song_name}_bass.wav")
+
+                    col3, col4 = st.columns(2)
+                    
+                    if os.path.exists(vocals_path):
+                        with col3:
+                            st.subheader("🎤 Vocals")
+                            st.audio(vocals_path)
+                            with open(vocals_path, "rb") as f:
+                                st.download_button("Download Vocals", f, file_name=f"{song_name}_vocals.wav")
+
+                    if os.path.exists(other_path):
+                        with col4:
+                            st.subheader("🎹 Synths & Atmosphere")
+                            st.audio(other_path)
+                            with open(other_path, "rb") as f:
+                                st.download_button("Download Other", f, file_name=f"{song_name}_other.wav")
+                else:
+                    st.error("Separation failed. Details below:")
+                    st.code(result.stderr)
