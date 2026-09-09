@@ -3,6 +3,7 @@ import subprocess
 import os
 import shutil
 import tempfile
+import sys
 
 st.set_page_config(page_title="Techno Stem Extractor", page_icon="🎛️", layout="centered")
 
@@ -17,14 +18,12 @@ if uploaded_file is not None:
     if st.button("Extract Stems", type="primary"):
         with st.spinner("Processing audio... (This takes 3–5 minutes on free CPU)"):
             with tempfile.TemporaryDirectory() as temp_dir:
-                # Save uploaded file
                 input_path = os.path.join(temp_dir, uploaded_file.name)
                 with open(input_path, "wb") as f:
                     f.write(uploaded_file.getbuffer())
                 
-                # Run Demucs with memory-efficient 10s chunking
                 cmd = [
-                    "python3", "-m", "demucs.separate",
+                    sys.executable, "-m", "demucs.separate",
                     "-n", "htdemucs_ft",
                     "--segment", "10",
                     "-o", temp_dir,
