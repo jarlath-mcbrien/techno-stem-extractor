@@ -1,9 +1,20 @@
+import os
+
+# Enforce single-threading BEFORE torch is loaded to prevent 1GB RAM OOM crashes
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 import streamlit as st
 import subprocess
-import os
-import shutil
-import tempfile
 import sys
+import tempfile
+import torch
+
+# Lock PyTorch CPU thread count
+torch.set_num_threads(1)
 
 st.set_page_config(page_title="Techno Stem Extractor", page_icon="🎛️", layout="centered")
 
@@ -16,7 +27,7 @@ if uploaded_file is not None:
     st.audio(uploaded_file, format="audio/wav")
     
     if st.button("Extract Stems", type="primary"):
-        with st.spinner("Processing audio... (This takes 3–5 minutes on free CPU)"):
+        with st.spinner("Processing audio... (Takes ~3–5 minutes on free CPU)"):
             with tempfile.TemporaryDirectory() as temp_dir:
                 input_path = os.path.join(temp_dir, uploaded_file.name)
                 with open(input_path, "wb") as f:
@@ -26,6 +37,8 @@ if uploaded_file is not None:
                     sys.executable, "-m", "demucs.separate",
                     "-n", "htdemucs_ft",
                     "--segment", "7",
+                    "-j", "1",
+                    "--device", "cpu",
                     "-o", temp_dir,
                     input_path
                 ]
