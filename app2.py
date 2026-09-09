@@ -25,7 +25,7 @@ if uploaded_file is not None:
                 cmd = [
                     sys.executable, "-m", "demucs.separate",
                     "-n", "htdemucs_ft",
-                    "--segment", "10",
+                    "--segment", "7",
                     "-o", temp_dir,
                     input_path
                 ]
