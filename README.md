@@ -22,3 +22,16 @@ Try the interactive web app: **[techno-stem-extractor.streamlit.app](https://tec
 
 ---
 
+## 🚀 Local Installation & Run
+
+```bash
+# Clone the repository
+git clone [https://github.com/jarlath-mcbrien/techno-stem-extractor.git](https://github.com/jarlath-mcbrien/techno-stem-extractor.git)
+cd techno-stem-extractor
+
+# Install dependencies (requires FFmpeg installed on system)
+pip install -r requirements.txt
+
+# Launch the Streamlit app
+streamlit run app.py
+
