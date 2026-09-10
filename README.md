@@ -2,7 +2,11 @@
 
 An AI-powered web application designed for music producers to isolate audio stems (Drums, Bass, Vocals, Other) from tracks and samples using Meta's `htdemucs` model—without expensive subscription paywalls.
 
-![App Screenshot](your-screenshot-filename.png)
+<img width="1912" height="817" alt="Screenshot 2026-09-10 131422" src="https://github.com/user-attachments/assets/298cd085-b7a6-4eb7-af6c-41ec91c740e8" />
+
+<img width="1915" height="810" alt="Screenshot 2026-09-10 131711" src="https://github.com/user-attachments/assets/ab8d0263-6768-4fea-8443-0c9c249c130f" />
+
+
 
 ## 🔗 Live Demo
 Try the interactive web app: **[techno-stem-extractor.streamlit.app](https://techno-stem-extractor.streamlit.app)**
